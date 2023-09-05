@@ -5,8 +5,11 @@ pygame.init()
 pole = init_pole.Pole()  # создаем объект для расстановки кораблей на игровом поле
 
 # размеры окна
-WIDTH = 400  # ширина поля
-HEIGHT = 400  # высота поля
+WIDTH = 600  # ширина окна
+HEIGHT = 400  # высота окна
+# размеры игрового поля
+W_POLE = 400
+H_POLE = 400
 
 # константы цветов
 WHITE = (255, 255, 255)
@@ -24,7 +27,7 @@ sc = pygame.display.set_mode((WIDTH, HEIGHT))  # игровое окно (шир
 x = 0  # координата движения курсора на игровом поле (движение по горизонтали)
 y = 0  # координата движения курсора на игровом поле (движение по вертикали)
 
-speed = WIDTH // 10  # скорость движения курсора
+speed = W_POLE // 10  # скорость движения курсора
 coord_x = 0  # инициализация координаты для сравнения координаты курсора на поле с координатой расположения корабля
 coord_y = 0  # инициализация координаты для сравнения координаты курсора на поле с координатой расположения корабля
 
@@ -33,7 +36,8 @@ moves = 1
 stage = 1
 START = True  # константа определения вызова меню
 
-pygame.display.set_caption('BattleShips')  # название игры в консоли игрового окна
+name = 'BattleShips'
+pygame.display.set_caption(name)  # название игры в консоли игрового окна
 pygame.display.set_icon(pygame.image.load('battle.bmp'))  # иконка в консоли игрового окна
 objects_deck = []  # список для хранения координат подбитых палуб
 object_past = []  # список для хранения координат куда мы уже стреляли
@@ -84,6 +88,27 @@ def set_menu():  # функция выбора количества ходов �
                     moves = moves_stage[stage]  # количество ходов
                     START = False
 
+
+def menu_stage(moves, ships, ev=None):
+    surf = pygame.Surface((WIDTH-W_POLE, HEIGHT))
+    surf.fill(BLACK)
+    if ev:
+        text_event = pygame.font.SysFont('arial', 22)
+        sc_text_event = text_event.render(ev, 1, RED, BLACK)
+        pos_text_event = sc_text_event.get_rect(center=(100, 100))
+        surf.blit(sc_text_event, pos_text_event)
+
+    text_ships = pygame.font.SysFont('arial', 22)
+    sc_ships_text = text_ships.render(f'Кораблей осталось {str(ships)}', 1, RED, BLACK)
+    pos_ships = sc_ships_text.get_rect(center=(100, 200))
+    surf.blit(sc_ships_text, pos_ships)
+
+    text = pygame.font.SysFont('arial', 22)
+    sc_text = text.render(f'Ходов {moves}', 1, RED, BLACK)
+    pos = sc_text.get_rect(center=(100, 50))
+    surf.blit(sc_text, pos)
+    sc.blit(surf, (W_POLE, 0))
+    pygame.display.update()
 
 def win():
     global RUNNING
@@ -151,21 +176,21 @@ def set_lines(coor_x, coor_y, obj=None, flag=None):  # функция для о�
             objects_deck.append(obj)  # добавляем координату подбитой палубы
         else:
             object_past.append(obj)  # добавляем координату выстрела мимо корабля
-    for x in range(0, HEIGHT, HEIGHT // 10):
-        pygame.draw.line(sc, BLUE, (0, x), (WIDTH, x))  # отрисовка горизонтальных линий поля
-    for x in range(0, WIDTH, WIDTH // 10):
-        pygame.draw.line(sc, BLUE, (x, 0), (x, HEIGHT))  # отрисовка вертикальных линий
-    pygame.draw.line(sc, BLUE, (0, HEIGHT), (WIDTH, HEIGHT), 4)  # крайняя нижняя линия поля
-    pygame.draw.line(sc, BLUE, (WIDTH, 0), (WIDTH, HEIGHT), 4)  # крайняя правая линия
-    pygame.draw.rect(sc, WHITE, (coor_x, coor_y, WIDTH // 10, HEIGHT // 10), 5)  # рисуем квадратный курсор
+    for x in range(0, H_POLE, H_POLE // 10):
+        pygame.draw.line(sc, BLUE, (0, x), (W_POLE, x))  # отрисовка горизонтальных линий поля
+    for x in range(0, W_POLE, W_POLE // 10):
+        pygame.draw.line(sc, BLUE, (x, 0), (x, H_POLE))  # отрисовка вертикальных линий
+    pygame.draw.line(sc, BLUE, (0, H_POLE), (W_POLE, H_POLE), 4)  # крайняя нижняя линия поля
+    pygame.draw.line(sc, BLUE, (W_POLE, 0), (W_POLE, H_POLE), 4)  # крайняя правая линия
+    pygame.draw.rect(sc, WHITE, (coor_x, coor_y, W_POLE // 10, H_POLE // 10), 5)  # рисуем квадратный курсор
     if len(objects_deck):
         for k in objects_deck:
             n, m = k[0], k[1]
-            pygame.draw.rect(sc, RED, (n, m, WIDTH // 11, HEIGHT // 11))  # отображаем на игровом поле подбитую палубу
+            pygame.draw.rect(sc, RED, (n, m, W_POLE // 11, H_POLE // 11))  # отображаем на игровом поле подбитую палубу
     if len(object_past):
         for k in object_past:
             n, m = k[0], k[1]
-            pygame.draw.rect(sc, GREY, (n, m, WIDTH // 11, HEIGHT // 11))  # отображаем на игровом поле выстрел мимо
+            pygame.draw.rect(sc, GREY, (n, m, W_POLE // 11, H_POLE // 11))  # отображаем на игровом поле выстрел мимо
 
 
 def find_ship(x, y):  # функция поиска корабля по координате игрового поля
@@ -183,11 +208,12 @@ while RUNNING:  # пока RUNNING == True, цикл не закончится
         set_menu()
         x = 0  # координата движения курсора на игровом поле (движение по горизонтали)
         y = 0  # координата движения курсора на игровом поле (движение по вертикали)
-        speed = WIDTH // 10  # скорость движения курсора
+        speed = W_POLE // 10  # скорость движения курсора
         coord_x = 0  # инициализация координаты для сравнения координаты курсора на поле с координатой расположения корабля
         coord_y = 0  # инициализация координаты для сравнения координаты курсора на поле с координатой расположения корабля
         sc = pygame.display.set_mode((WIDTH, HEIGHT))  # игровое окно (ширина, высота)
         set_lines(coord_x, coord_y)  # рисуем поле
+        menu_stage(moves, len(pole.ships_pole))
         pygame.display.update()
     if moves == 0:
         lost()
@@ -202,23 +228,26 @@ while RUNNING:  # пока RUNNING == True, цикл не закончится
                     x -= speed  # сдвигаем курсор влево на заданную величину
                     coord_x -= 1  # смещаем координату для поиска в соответствии с координатой курсора
                     set_lines(x, y)  # перерисовываем поле с новыми координатами курсора
+                    menu_stage(moves, len(pole.ships_pole))
             elif event.key == pygame.K_RIGHT:
-                if x < WIDTH - speed:
+                if x < W_POLE - speed:
                     x += speed
                     coord_x += 1
                     set_lines(x, y)
+                    menu_stage(moves, len(pole.ships_pole))
             elif event.key == pygame.K_UP:
                 if y > 0:
                     y -= speed
                     coord_y -= 1
                     set_lines(x, y)
+                    menu_stage(moves, len(pole.ships_pole))
             elif event.key == pygame.K_DOWN:
                 if y < HEIGHT - speed:
                     y += speed
                     coord_y += 1
                     set_lines(x, y)
+                    menu_stage(moves, len(pole.ships_pole))
             elif event.key == pygame.K_SPACE:  # нажата клавиша 'пробел'
-
                 if pole.pole[coord_y][coord_x] == '*':  # проверка на попадание по кораблю
                     moves -= 1
                     pole.pole[coord_y][coord_x] = 1  # изменение значения после попадания по кораблю
@@ -226,19 +255,28 @@ while RUNNING:  # пока RUNNING == True, цикл не закончится
                     ship.counter -= 1  # уменьшение очков прочности корабля
                     if ship.counter > 0:  # проверка прочности корабля
                         print('Ранил')
+                        ev = 'Ранил'
                     else:
                         pole.ships_pole.remove(ship)  # удаление корабля из списка если его прочность равна 0
                         print('Убил')
+                        ev = 'Убил'
                     set_lines(x, y, (x, y), True)  # перерисовка всего поля с новыми данными после события
+                    menu_stage(moves, len(pole.ships_pole), ev)
                 elif pole.pole[coord_y][coord_x] == 1:  # сообщение по повторной координате
                     print('Уже стреляли')
+                    ev = 'Уже стреляли'
+                    menu_stage(moves, len(pole.ships_pole), ev)
                 elif pole.pole[coord_y][coord_x] == 2:
                     print('Уже стреляли')
+                    ev = 'Уже стреляли'
+                    menu_stage(moves, len(pole.ships_pole), ev)
                 else:
                     moves -= 1
                     pole.pole[coord_y][coord_x] = 2
                     print('Мимо')
+                    ev = 'Мимо'
                     set_lines(x, y, (x, y), False)  # отрисовка игрового поля после промаха
+                    menu_stage(moves, len(pole.ships_pole), ev)
                 print(moves)
                 for i in pole.pole:
                     print(*i)
