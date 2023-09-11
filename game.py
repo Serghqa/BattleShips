@@ -42,6 +42,7 @@ pygame.display.set_icon(pygame.image.load('battle.bmp'))  # иконка в ко
 objects_deck = []  # список для хранения координат подбитых палуб
 object_past = []  # список для хранения координат куда мы уже стреляли
 
+
 def set_menu():  # функция выбора количества ходов в меню перед началом игры
     global objects_deck
     global object_past
@@ -89,8 +90,8 @@ def set_menu():  # функция выбора количества ходов �
                     START = False
 
 
-def menu_stage(moves, ships, ev=None):
-    surf = pygame.Surface((WIDTH-W_POLE, HEIGHT))
+def menu_stage(moves, ships, ev=None):  # текстовое меню количества ходов и кораблей
+    surf = pygame.Surface((WIDTH - W_POLE, HEIGHT))
     surf.fill(BLACK)
     if ev:
         text_event = pygame.font.SysFont('arial', 22)
@@ -110,7 +111,8 @@ def menu_stage(moves, ships, ev=None):
     sc.blit(surf, (W_POLE, 0))
     pygame.display.update()
 
-def win():
+
+def win():  # меню после победы
     global RUNNING
     global START
     while not START:
@@ -120,9 +122,9 @@ def win():
         text_win = text.render('Поздравляем!', 1, BLUE, GREEN)
         pos = text_win.get_rect(center=(WIDTH // 2, HEIGHT // 6))
         text_restart = text.render('Начать заново - жми 1', 1, BLUE, GREEN)
-        pos_restart = text_restart.get_rect(center=(WIDTH//2, HEIGHT//3))
+        pos_restart = text_restart.get_rect(center=(WIDTH // 2, HEIGHT // 3))
         text_end = text.render('Закончить - жми 2', 1, BLUE, GREEN)
-        pos_end = text_end.get_rect(center=(WIDTH//2, HEIGHT//2))
+        pos_end = text_end.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         surf.blit(text_restart, pos_restart)
         surf.blit(text_end, pos_end)
         surf.blit(text_win, pos)
@@ -139,7 +141,8 @@ def win():
                     RUNNING = False
                     START = True
 
-def lost():
+
+def lost():  # меню после проигрыша
     global RUNNING
     global START
     while not START:
@@ -202,7 +205,6 @@ def find_ship(x, y):  # функция поиска корабля по коор
 clock = pygame.time.Clock()  # объект для создания ограничения кадров в секунду (FPS)
 set_lines(coord_x, coord_y)  # рисуем поле
 
-
 while RUNNING:  # пока RUNNING == True, цикл не закончится
     if START:
         set_menu()
@@ -223,25 +225,25 @@ while RUNNING:  # пока RUNNING == True, цикл не закончится
         if event.type == pygame.QUIT:  # если событие == 'закрыть окно', RUNNING = False и основной цикл закончится
             RUNNING = False
         elif event.type == pygame.KEYDOWN:  # проверка нажатия клавиши на клавиатуре
-            if event.key == pygame.K_LEFT:  # нажата клавиша 'стрелка влево'
+            if event.key == pygame.K_LEFT:  # движение курсора влево
                 if x > 0:  # проверяем выход за границы игрового поля
                     x -= speed  # сдвигаем курсор влево на заданную величину
                     coord_x -= 1  # смещаем координату для поиска в соответствии с координатой курсора
                     set_lines(x, y)  # перерисовываем поле с новыми координатами курсора
                     menu_stage(moves, len(pole.ships_pole))
-            elif event.key == pygame.K_RIGHT:
+            elif event.key == pygame.K_RIGHT:  # движение курсора вправо
                 if x < W_POLE - speed:
                     x += speed
                     coord_x += 1
                     set_lines(x, y)
                     menu_stage(moves, len(pole.ships_pole))
-            elif event.key == pygame.K_UP:
+            elif event.key == pygame.K_UP:  # движение курсора вверх
                 if y > 0:
                     y -= speed
                     coord_y -= 1
                     set_lines(x, y)
                     menu_stage(moves, len(pole.ships_pole))
-            elif event.key == pygame.K_DOWN:
+            elif event.key == pygame.K_DOWN:  # движение курсора вниз
                 if y < HEIGHT - speed:
                     y += speed
                     coord_y += 1
